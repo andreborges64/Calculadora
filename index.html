@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Calculadora</title>
+        <link rel="stylesheet" href="CSS/Stiles.css" type="text/css">
+    </head>
+    <body>
+        <div id="calculadora">
+            <div id="visor">
+                <div id="mode" style="float: right; font-size:20px; margin-right: 1em;">rad</div>
+                <div id="conta" style="float: left; font-size:30px; margin-left: 1em;"></div>
+                <div id="resultado" style="float: right; font-size: 40px;"></div>
+            </div>
+            <div id="acessibilidade">
+                <button id="btnToggleColors">Cores</button>
+                <button id="changeFontBtn">Fonte</button>
+                <button id="zoomInBtn" onclick="zoomIn()">🔍+</button>
+                <button id="zoomOutBtn" onclick="zoomOut()">🔍-</button>
+            </div>
+            <div id="botoes">
+                <button onclick="inserirFuncao('tan')">tan</button>
+                <button onclick="inserirFuncao('tan-1')">tan⁻¹</button>
+                <button onclick="inserirPi()">π</button>
+                <button onclick="limparVisor('ac')" id="limpar">AC</button>
+                <button onclick="limparVisor('c')" id="limpar">C</button>
+                <button onclick="inserirFuncao('cos')">cos</button>
+                <button onclick="inserirFuncao('cos-1')">cos⁻¹</button>
+                <button id="botaoExp" class="operador" onclick="inserirOperador('exp')">exp</button>
+                <button onclick="inserirFuncao('!')">n!</button>
+                <button onclick="inserirOperador('mode')" id="modo">mode</button>
+                <button onclick="inserirFuncao('sin')">sin</button>
+                <button onclick="inserirFuncao('sin-1')">sin⁻¹</button>
+                <button onclick="adicionarParentesesAbertura()">&#40;</button>
+                <button onclick="adicionarParentesesFechamento()">&#41;</button>
+                <button onclick="inserirOperador('/')" class="operador">&#247;</button>
+                <button onclick="inserirFuncao('sqrt')">√</button>
+                <button onclick="inserirDigito('7')" class="numero">7</button>
+                <button onclick="inserirDigito('8')" class="numero">8</button>
+                <button onclick="inserirDigito('9')" class="numero">9</button>
+                <button onclick="inserirOperador('*')" class="operador">*</button>
+                <button id="potenciacao" onclick="inserirOperador('^')">x^y</button>
+                <button onclick="inserirDigito('4')" class="numero">4</button>
+                <button onclick="inserirDigito('5')" class="numero">5</button>
+                <button onclick="inserirDigito('6')" class="numero">6</button>
+                <button onclick="inserirOperador('-')" class="operador">-</button>
+                <button onclick="inserirFuncao('log')">log</button>
+                <button onclick="inserirDigito('1')" class="numero">1</button>
+                <button onclick="inserirDigito('2')" class="numero">2</button>
+                <button onclick="inserirDigito('3')" class="numero">3</button>
+                <button onclick="inserirOperador('+')" class="operador">+</button>
+                <button onclick="inserirFuncao('ln')">ln</button>
+                <button onclick="inverterSinal()">(-)</button>
+                <button onclick="inserirDigito('0')" class="numero">0</button>
+                <button onclick="adicionarDigito('.')" id="ponto">.</button>
+                <button onclick="calcularResultado()" id="igual">=</button>
+            </div>
+          </div>
+          
+    </body>
+    <script src="JS/scripts.js"></script>
+</html>

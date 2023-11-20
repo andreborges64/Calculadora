@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Lexend:wght@300&display=swap');
+*{
+    padding: 0;
+    margin: 0;
+}
+html{
+    font-size: 16px;
+}
+body.lexend{
+    font-family: 'Lexend', sans-serif;
+}
+body:not(.lexend) {
+    font-family: sans-serif;
+}
+:root {
+    --calculadora: #e1dbdb;
+    --tela: #72c492;
+    --operadores: #958f8f;
+    --numeros: #ffffff;
+    --numerosbot: black;
+    --mode: #66ff00;
+    --clean: #ff0000;
+    --btn:#ff7300;
+    --teladalt: #ff0000;
+    --operadoresdalt: #bdb3b3;
+    --btndalt:#ffff00;
+}
+#calculadora {
+    background-color: var(--calculadora);
+    width: 25vw; /* Aproximadamente o tamanho do Redmi Note 8 Pro */
+    height: 70vh;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr 7fr;
+    gap: 10px; /* Adicione o gap entre as linhas */
+    padding: 10px;
+    border-radius: 8px;
+}
+#visor {
+    background-color: var(--tela);
+    color: var(--numeros);
+    height: 20vh;
+    border-radius: 8px;
+    margin-top: 8px;
+}
+button {
+    background-color: var(--operadores);
+    color: var(--numerosbot);
+}  
+/* Para os botões de modo (Mode) */
+#modo{
+    background-color: var(--mode);
+}
+/* Para os botões de Clear */
+#limpar{
+    background-color: var(--clean);
+    color: var(--numeros);
+}
+body {
+    display: grid;
+    place-items: center;
+    height: 100vh;
+    margin: 0;
+    font-family: sans-serif;
+}
+#btnToggleColors, #changeFontBtn, #zoomInBtn, #zoomOutBtn{
+    height: 5vh;
+    background-color: var(--btn);
+}
+#botoes {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    margin-bottom: 8px;
+}  
+button {
+    /* Estilos para os botões */
+    border-radius: 8px; /* Bordas levemente arredondadas */
+}
+body.daltonismo{
+    background-color: #f0f0f0;
+    color: #333333;
+}
+button.daltonismo{
+    background-color: var(--operadoresdalt);
+}
+#btnToggleColors.daltonismo, #changeFontBtn.daltonismo{
+    background-color: var(--btndalt);
+}
+#visor.daltonismo{
+    background-color: var(--teladalt);
+}
+#acessibilidade {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-evenly;
+}  
+#acessibilidade button {
+    font-size: 16px;
+    cursor: pointer;
+    width: 20%;
+}
+@media (max-width: 750px) {
+    #calculadora{
+        width:65vw;
+        height:75vh;
+    } 
+    #visor{
+        height:29vh;
+    }
+ }  
+@media (max-width: 500px) {
+    #calculadora{
+        width:90vw;
+        height:90vh;
+    } 
+    #visor{
+        height:29vh;
+    }
+ }     
