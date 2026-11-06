@@ -306,8 +306,9 @@ function zoomOut() {
   if (escala > escalaMinima) { escala -= incrementoEscala; aplicarEscala(); }
 }
 function aplicarEscala() {
-  document.body.style.transform = "scale(" + escala / 100 + ")";
-  document.body.style.transformOrigin = "top left";
+  const calculadora = document.getElementById("calculadora");
+  calculadora.style.transform = "scale(" + escala / 100 + ")";
+  calculadora.style.transformOrigin = "center center";
 }
 
 document.addEventListener("keydown", evento => {
