@@ -276,7 +276,14 @@ function formatarResultado(valor) {
 function calcularResultado() {
   if (!expressao.trim()) return;
   try {
-    const resultado = avaliarExpressao(expressao);
+    // Completa chamadas como sin(30) ao pressionar "=" sem exigir ")".
+    const abertos = (expressao.match(/\(/g) || []).length;
+    const fechados = (expressao.match(/\)/g) || []).length;
+    if (fechados > abertos) throw new Error("Parênteses incorretos");
+    const expressaoCompleta = expressao + ")".repeat(abertos - fechados);
+    const resultado = avaliarExpressao(expressaoCompleta);
+    expressao = expressaoCompleta;
+    atualizarVisor();
     displayResultado.textContent = formatarResultado(resultado);
   } catch (erro) {
     displayResultado.textContent = "Erro";
