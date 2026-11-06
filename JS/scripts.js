@@ -1,503 +1,333 @@
-// Variável de controle para verificar se uma operação foi realizada
-let operacaoRealizada = false;
-// Variáveis para rastrear a operação e os números
-let operador = "";
-let numeroAnterior = "";
-let novoNumero = "";
-let calculando = false;
+"use strict";
+
+let expressao = "";
 let modoRadianos = true;
-let parentesesAbertos = 0;
-// Variável para armazenar a expressão dentro dos parênteses
-let expressaoDentroDosParenteses = "";
-// Função para atualizar o visor
+let escala = 100;
+const incrementoEscala = 10;
+const escalaMinima = 100;
+const escalaMaxima = 200;
+
+const displayConta = document.getElementById("conta");
+const displayResultado = document.getElementById("resultado");
+const displayModo = document.getElementById("mode");
+
 function atualizarVisor() {
-  const visor = document.getElementById("visor");
-  let visorConteudo = "";
-  if (numeroAnterior !== "") {
-    visorConteudo += numeroAnterior;
-  }
-  if (operador !== "") {
-    visorConteudo += " " + operador + " ";
-  }
-  visorConteudo += novoNumero;
-  // Adicione os parênteses de abertura e fechamento ao conteúdo do visor
-  if (parentesesAbertos > 0) {
-    visorConteudo += " (".repeat(parentesesAbertos);
-  }
-  visor.textContent = visorConteudo;
+  displayConta.textContent = expressao
+    .replace(/\b(sin|cos|tan|asin|acos|atan|sqrt|log|ln)\(/g, "$1(")
+    .replace(/\*/g, "×")
+    .replace(/\//g, "÷")
+    .replace(/\bpi\b/g, "π")
+    .replace(/\bE\b/g, " × 10^");
 }
-// Função para adicionar parênteses de abertura
-function adicionarParentesesAbertura() {
-  if (calculando) {
-    numeroAnterior = "";
-    calculando = false;
-  }
-  if (numeroAnterior !== "") {
-    novoNumero += operador; // Adicione o operador antes do parêntese de abertura
-    operador = "";
-  }
-  novoNumero += "(";
-  parentesesAbertos++;
-  atualizarVisor();
-}
-function avaliarExpressao(expressao) {
-  try {
-    // Substitua "^" por "**" para representar a potenciação
-    expressao = expressao.replace(/\^/g, '**');
-    // Avalie a expressão usando a função eval
-    const resultado = eval(expressao);
-    // Se o resultado for NaN, é um erro
-    if (isNaN(resultado)) {
-      console.error("Erro na expressão: " + expressao);
-      return NaN;
-    }
-    // Use toFixed para limitar o número de casas decimais apropriado
-    return parseFloat(resultado.toFixed(10));
-  } catch (error) {
-    console.error("Erro na expressão: " + error);
-    return NaN;
-  }
-}
-function adicionarParentesesFechamento() {
-  if (parentesesAbertos > 0 && !calculando) {
-    novoNumero += ")";
-    parentesesAbertos--;
-    atualizarVisor();
-  }
-}
-// Função para avaliar a expressão dentro dos parênteses
-function avaliarExpressaoDentroDosParenteses() {
-  try {
-    const resultado = eval(expressaoDentroDosParenteses);
-    return resultado;
-  } catch (error) {
-    console.error("Erro na expressão dentro dos parênteses: " + error);
-    return NaN;
-  }
-}
-function limparCalculadora() {
-  numeroAnterior = "";
-  operador = "";
-  novoNumero = "";
-  calculando = false;
-  atualizarVisor();
-  operacaoRealizada = false; // Adicionado para reiniciar a operação
-  document.getElementById('mode').textContent = 'rad';
-}
-function limparOperacao() {
-  numeroAnterior = "";
-  operador = "";
-  novoNumero = "";
-  calculando = false;
-  atualizarVisor();
-}
-// Função para inserir o valor de π (pi) no visor
-function inserirPi() {
-  if (calculando) {
-    numeroAnterior = "";
-    calculando = false;
-  }
-  novoNumero += Math.PI; // Utilizamos a constante Math.PI para representar π
-  atualizarVisor();
-}
-// Função para adicionar um ponto decimal
-function adicionarPontoDecimal() {
-  if (calculando) {
-    novoNumero = "0.";
-    calculando = false;
-  } else if (!novoNumero.includes(".")) {
-    novoNumero += ".";
-  }
-  atualizarVisor();
-}
-// Função para realizar cálculos
-function calcular() {
-  let resultado;
-  const num1 = parseFloat(numeroAnterior);
-  const num2 = parseFloat(novoNumero);
-  switch (operador) {
-    case "+":
-      resultado = num1 + num2;
-      break;
-    case "-":
-      resultado = num1 - num2;
-      break;
-    case "*":
-      resultado = num1 * num2;
-      break;
-    case "/":
-      resultado = num1 / num2;
-      break;
-    case "^":
-      resultado = Math.pow(num1,num2);
-      break;
-    case "e":
-      resultado = num1*(Math.pow(10,num2));
-      break;
-  }
 
-  // Use toFixed para limitar o número de casas decimais apropriado
-  numeroAnterior = parseFloat(resultado.toFixed(10));
-  operador = "";
-  novoNumero = "";
-  calculando = true;
+function inserirDigito(digito) {
+  iniciarNovaExpressaoSeNecessario();
+  expressao += digito;
+  displayResultado.textContent = "";
   atualizarVisor();
-  atualizarResultado(numeroAnterior);
 }
-// Função para lidar com os números
+
 function adicionarNumero(numero) {
-  if (operacaoRealizada) {
-    // Se uma operação foi realizada, limpar os valores anteriores
-    numeroAnterior = "";
-    operador = "";
-    novoNumero = "";
-    calculando = false;
-    atualizarResultado();
-    operacaoRealizada = false;
-  }
-  if (calculando) {
-    novoNumero = numero.toString();
-    calculando = false;
-  } else {
-    // Certifique-se de que o ponto decimal seja adicionado apenas uma vez
-    if (numero === "." && novoNumero.includes(".")) {
-      return;
-    }
-    if (novoNumero.endsWith("(")) {
-      // Se o último caractere for um parêntese de abertura, adicione um operador antes do número
-      operador = numero;
-    } else {
-      novoNumero += numero.toString();
-    }
-  }
-  atualizarVisor();
+  inserirDigito(String(numero));
 }
-// Função para limpar o visor
-function limparVisor(tipo) {
-  if (tipo === 'ac') {
-    numeroAnterior = "";
-    operador = "";
-    novoNumero = "";
-    calculando = false;
-    modoRadianos = true; // Isso restaurará o modo para "rad" ao limpar a calculadora
-    document.getElementById('mode').textContent = 'rad';
-  } else if (tipo === 'c') {
-    novoNumero = "";
-  }
-  atualizarVisor();
-}
-// Função para inverter o sinal do número
-function inverterSinal() {
-  if (novoNumero !== "") {
-    novoNumero = (-parseFloat(novoNumero)).toString();
-    atualizarVisor();
-  } else if (numeroAnterior !== "" && operador !== "") {
-    operador = operador === "+" ? "-" : "+";
-    atualizarVisor();
-  }
 
+function adicionarDigito(digito) {
+  iniciarNovaExpressaoSeNecessario();
+  if (digito === "." && /\d*\.?\d*$/.test(expressao.split(/[+\-*/^(),]/).pop()) &&
+      expressao.split(/[+\-*/^(),]/).pop().includes(".")) return;
+  expressao += digito;
+  displayResultado.textContent = "";
+  atualizarVisor();
 }
-// Função para inserir funções trigonométricas e alternar entre "rad" e "deg"
-function inserirFuncao(funcao) {
-  if (funcao === 'sin') {
-    if (modoRadianos) {
-      // Em modo radianos, calcular o seno
-      const resultado = Math.sin(parseFloat(novoNumero));
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    } else {
-      // Em modo graus, converter graus para radianos e calcular o seno
-      const graus = parseFloat(novoNumero);
-      const radianos = (graus * Math.PI) / 180;
-      const resultado = Math.sin(radianos);
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    }
+
+function iniciarNovaExpressaoSeNecessario() {
+  if (displayResultado.textContent) {
+    expressao = "";
+    displayResultado.textContent = "";
   }
-  else if (funcao === 'sin-1') {
-    if (modoRadianos) {
-      // Em modo radianos, calcular o seno
-      const resultado = Math.asin(parseFloat(novoNumero));
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    } else {
-      // Em modo graus, converter graus para radianos e calcular o seno
-      const graus = parseFloat(novoNumero);
-      const radianos = (graus * Math.PI) / 180;
-      const resultado = Math.asin(radianos);
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    }
-  }
-  else if (funcao === 'cos') {
-    if (modoRadianos) {
-      // Em modo radianos, calcular o seno
-      const resultado = Math.cos(parseFloat(novoNumero));
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    } else {
-      // Em modo graus, converter graus para radianos e calcular o seno
-      const graus = parseFloat(novoNumero);
-      const radianos = (graus * Math.PI) / 180;
-      const resultado = Math.cos(radianos);
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    }
-  }
-  else if (funcao === 'cos-1') {
-    if (modoRadianos) {
-      // Em modo radianos, calcular o seno
-      const resultado = Math.acos(parseFloat(novoNumero));
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    } else {
-      // Em modo graus, converter graus para radianos e calcular o seno
-      const graus = parseFloat(novoNumero);
-      const radianos = (graus * Math.PI) / 180;
-      const resultado = Math.acos(radianos);
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    }
-  }
-  else if (funcao === 'tan') {
-    if (modoRadianos) {
-      // Em modo radianos, calcular o seno
-      const resultado = Math.tan(parseFloat(novoNumero));
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    } else {
-      // Em modo graus, converter graus para radianos e calcular o seno
-      const graus = parseFloat(novoNumero);
-      const radianos = (graus * Math.PI) / 180;
-      const resultado = Math.tan(radianos);
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    }
-  }
-  else if (funcao === 'tan-1') {
-    if (modoRadianos) {
-      // Em modo radianos, calcular o seno
-      const resultado = Math.atan(parseFloat(novoNumero));
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    } else {
-      // Em modo graus, converter graus para radianos e calcular o seno
-      const graus = parseFloat(novoNumero);
-      const radianos = (graus * Math.PI) / 180;
-      const resultado = Math.atan(radianos);
-      if (resultado === 1.2246467991473532e-16) {
-        novoNumero = '0';
-      } else {
-        novoNumero = resultado.toString();
-      }
-    }
-  }
-  else if (funcao === 'log') {
-    // Verifica se o novo número é maior que 0, pois o logaritmo de 0 ou número negativo não está definido.
-    if (parseFloat(novoNumero) > 0) {
-      // Calcula o logaritmo natural (base e) do novo número.
-      novoNumero = Math.log10(parseFloat(novoNumero));
-    } else {
-      // Caso o número seja 0 ou negativo, exibe uma mensagem de erro ou faz o tratamento desejado.
-      novoNumero = 'Erro'; // Você pode personalizar essa mensagem de erro.
-    }
-  }
-  else if (funcao === 'ln') {
-    // Verifica se o novo número é maior que 0, pois o logaritmo de 0 ou número negativo não está definido.
-    if (parseFloat(novoNumero) > 0) {
-      // Calcula o logaritmo natural (base e) do novo número.
-      novoNumero = Math.log10(parseFloat(novoNumero))*2.3;
-    } else {
-      // Caso o número seja 0 ou negativo, exibe uma mensagem de erro ou faz o tratamento desejado.
-      novoNumero = 'Erro'; // Você pode personalizar essa mensagem de erro.
-    }
-  }
-  else if (funcao === 'sqrt') {
-    // Verifica se o novo número é maior que 0, pois o logaritmo de 0 ou número negativo não está definido.
-    if (parseFloat(novoNumero) >= 0) {
-      // Calcula o logaritmo natural (base e) do novo número.
-      novoNumero = Math.sqrt(parseFloat(novoNumero));
-    } else {
-      // Caso o número seja 0 ou negativo, exibe uma mensagem de erro ou faz o tratamento desejado.
-      novoNumero = 'Erro'; // Você pode personalizar essa mensagem de erro.
-    }
-  }
-  else if (funcao === '!') {
-    // Verifica se o número é um número inteiro não negativo.
-    if (Number.isInteger(parseFloat(novoNumero)) && parseFloat(novoNumero) >= 0) {
-      novoNumero = calcularFatorial(parseFloat(novoNumero));
-    } else {
-      novoNumero = 'Erro'; // Número inválido para o fatorial.
-    }
+}
+
+function inserirOperador(op) {
+  iniciarNovaExpressaoSeNecessario();
+  if (op === "mode") return alternarModo();
+  const atual = expressao.trim();
+  if (!atual && op !== "-") return;
+  if (/[+\-*/^]$/.test(atual)) {
+    expressao = atual.slice(0, -1) + op;
+  } else {
+    expressao += op === "exp" ? "E" : op;
   }
   atualizarVisor();
 }
-function calcularFatorial(numero) {
-  if (numero === 0) {
-    return 1;
-  }
-  let resultado = 1;
-  for (let i = 1; i <= numero; i++) {
-    resultado *= i;
-  }
-  return resultado;
+
+function adicionarParentesesAbertura() {
+  iniciarNovaExpressaoSeNecessario();
+  expressao += "(";
+  atualizarVisor();
 }
-// Função para alternar entre "rad" e "deg" no visor
+
+function adicionarParentesesFechamento() {
+  iniciarNovaExpressaoSeNecessario();
+  const abertos = (expressao.match(/\(/g) || []).length;
+  const fechados = (expressao.match(/\)/g) || []).length;
+  if (abertos > fechados && /[\d)!pi]$/.test(expressao)) {
+    expressao += ")";
+    atualizarVisor();
+  }
+}
+
+function inserirPi() {
+  iniciarNovaExpressaoSeNecessario();
+  expressao += "pi";
+  displayResultado.textContent = "";
+  atualizarVisor();
+}
+
+function inserirFuncao(nome) {
+  iniciarNovaExpressaoSeNecessario();
+  if (nome === "!") {
+    expressao += "!";
+  } else {
+    const aliases = { "sin-1": "asin", "cos-1": "acos", "tan-1": "atan" };
+    expressao += (aliases[nome] || nome) + "(";
+  }
+  displayResultado.textContent = "";
+  atualizarVisor();
+}
+
+function inverterSinal() {
+  iniciarNovaExpressaoSeNecessario();
+  if (!expressao) {
+    expressao = "-";
+  } else if (/[+\-*/^(]$/.test(expressao)) {
+    expressao += "-";
+  } else {
+    expressao = "-(" + expressao + ")";
+  }
+  atualizarVisor();
+}
+
+function limparVisor(tipo) {
+  if (tipo === "ac" || tipo === "c") {
+    expressao = "";
+    displayResultado.textContent = "";
+    if (tipo === "ac") {
+      modoRadianos = true;
+      displayModo.textContent = "rad";
+    }
+    atualizarVisor();
+  }
+}
+
+function limparCalculadora() {
+  limparVisor("ac");
+}
+
+function limparOperacao() {
+  limparVisor("c");
+}
+
 function alternarModo() {
   modoRadianos = !modoRadianos;
-  const modoElement = document.getElementById('mode');
-  modoElement.textContent = modoRadianos ? 'rad' : 'deg';
+  displayModo.textContent = modoRadianos ? "rad" : "deg";
 }
-// Event listener para o botão de igual
-document.getElementById("igual").addEventListener("click", () => {
-  if (operador === "e") {
-    calcularExp();
-  } else {
-    calcularResultado();
+
+function fatorar(n) {
+  if (!Number.isInteger(n) || n < 0 || n > 170) throw new Error("Fatorial exige inteiro entre 0 e 170");
+  let resultado = 1;
+  for (let i = 2; i <= n; i++) resultado *= i;
+  return resultado;
+}
+
+function tokenizar(texto) {
+  const tokens = [];
+  const regex = /\s*([0-9]+(?:\.[0-9]*)?(?:e[+-]?[0-9]+)?|\.[0-9]+(?:e[+-]?[0-9]+)?|[A-Za-z]+|[()+\-*/^!,])/gy;
+  let pos = 0;
+  while (pos < texto.length) {
+    regex.lastIndex = pos;
+    const match = regex.exec(texto);
+    if (!match) throw new Error("Caractere inválido na expressão");
+    tokens.push(match[1]);
+    pos = regex.lastIndex;
   }
-});
-document.getElementById("igual").addEventListener("click", () => {
-  if (parentesesAbertos === 0) {
-    calcularResultado();
-  } else {
-    console.log("Erro: Parênteses não estão balanceados.");
+  const expandidos = [];
+  const terminaValor = t => t === ")" || t === "!" || t === "pi" || t === "e" || /^[0-9.]/.test(t);
+  const iniciaValor = t => t === "(" || t === "pi" || t === "e" || /^[0-9.]/.test(t);
+  for (let i = 0; i < tokens.length; i++) {
+    const anterior = tokens[i - 1];
+    const atual = tokens[i];
+    if (i && terminaValor(anterior) && iniciaValor(atual)) expandidos.push("*");
+    expandidos.push(atual);
   }
-});
-// Adicione a alternância de "rad" e "deg" ao botão "mode"
-document.getElementById('modo').addEventListener('click', alternarModo);
-// Event listeners para os botões de números
-document.querySelectorAll(".numero").forEach((button) => {
-  button.addEventListener("click", () => {
-    adicionarNumero(button.textContent);
-  });
-})
-// Event listeners para os botões de operadores
-document.querySelectorAll(".operador").forEach((button) => {
-  button.addEventListener("click", () => {
-    if (numeroAnterior !== "" && !calculando) {
-      calcular();
+  return expandidos;
+}
+
+function avaliarExpressao(texto) {
+  const tokens = tokenizar(texto);
+  let indice = 0;
+  const atual = () => tokens[indice];
+  const consumir = esperado => {
+    if (atual() !== esperado) throw new Error("Expressão incompleta ou parênteses incorretos");
+    indice++;
+  };
+  const verificar = valor => {
+    if (!Number.isFinite(valor)) throw new Error("Resultado fora do domínio real");
+    return valor;
+  };
+  const primario = () => {
+    const t = atual();
+    if (t === undefined) throw new Error("Expressão incompleta");
+    if (t === "+") { indice++; return unario(); }
+    if (t === "-") { indice++; return -unario(); }
+    if (t === "(") {
+      indice++;
+      const valor = soma();
+      consumir(")");
+      return valor;
     }
-    operador = button.textContent;
-    numeroAnterior = novoNumero;
-    calculando = true;
-    atualizarVisor();
-  });
-})
-// Event listener para o botão de limpar
-document.getElementById("limpar").addEventListener("click", () => {
-  limparCalculadora();
-});
-// Event listener para o botão de ponto decimal
-document.getElementById("ponto").addEventListener("click", () => {
-  adicionarPontoDecimal();
-});
-// Event listener para o botão de potenciação
-document.getElementById("potenciacao").addEventListener("click", () => {
-  if (numeroAnterior !== "" && !calculando) {
-    calcular();
-  }
-  operador = "^";
-  numeroAnterior = novoNumero; // Mostra o primeiro número e "^" no visor
-  novoNumero = "";
-  calculando = false;
-  atualizarVisor();
-});
-// Event listener para o botão "exp"
-document.getElementById("botaoExp").addEventListener("click", () => {
-  if (numeroAnterior !== "" && !calculando) {
-    calcular();
-  }
-  operador = "e";
-  numeroAnterior = novoNumero; // Mostra o primeiro número e "^" no visor
-  novoNumero = "";
-  calculando = false;
-  atualizarVisor();
-});
-// Função para calcular o resultado quando o botão "=" é pressionado
+    if (/^[0-9.]/.test(t)) {
+      indice++;
+      const valor = Number(t);
+      if (!Number.isFinite(valor)) throw new Error("Número inválido");
+      return valor;
+    }
+    if (t === "pi") { indice++; return Math.PI; }
+    if (t === "e") { indice++; return Math.E; }
+    if (/^[A-Za-z]+$/.test(t)) {
+      indice++;
+      consumir("(");
+      const x = soma();
+      consumir(")");
+      const rad = modoRadianos ? x : x * Math.PI / 180;
+      let resultado;
+      switch (t) {
+        case "sin": resultado = Math.sin(rad); break;
+        case "cos": resultado = Math.cos(rad); break;
+        case "tan": resultado = Math.tan(rad); break;
+        case "asin": resultado = modoRadianos ? Math.asin(x) : Math.asin(x) * 180 / Math.PI; break;
+        case "acos": resultado = modoRadianos ? Math.acos(x) : Math.acos(x) * 180 / Math.PI; break;
+        case "atan": resultado = modoRadianos ? Math.atan(x) : Math.atan(x) * 180 / Math.PI; break;
+        case "sqrt": resultado = Math.sqrt(x); break;
+        case "log": resultado = Math.log10(x); break;
+        case "ln": resultado = Math.log(x); break;
+        default: throw new Error("Função desconhecida: " + t);
+      }
+      return verificar(resultado);
+    }
+    throw new Error("Valor inesperado: " + t);
+  };
+  const posfixo = () => {
+    let valor = primario();
+    while (atual() === "!") {
+      indice++;
+      valor = fatorar(valor);
+    }
+    return valor;
+  };
+  const potencia = () => {
+    let base = posfixo();
+    if (atual() === "^") {
+      indice++;
+      base = verificar(Math.pow(base, unario()));
+    }
+    return base;
+  };
+  const unario = () => {
+    if (atual() === "+") { indice++; return unario(); }
+    if (atual() === "-") { indice++; return -unario(); }
+    return potencia();
+  };
+  const produto = () => {
+    let valor = unario();
+    while (atual() === "*" || atual() === "/" || atual() === "E") {
+      const op = atual();
+      indice++;
+      const proximo = unario();
+      if (op === "*") valor *= proximo;
+      if (op === "/") {
+        if (proximo === 0) throw new Error("Divisão por zero");
+        valor /= proximo;
+      }
+      if (op === "E") valor *= Math.pow(10, proximo);
+      valor = verificar(valor);
+    }
+    return valor;
+  };
+  const soma = () => {
+    let valor = produto();
+    while (atual() === "+" || atual() === "-") {
+      const op = atual();
+      indice++;
+      const proximo = produto();
+      valor = verificar(op === "+" ? valor + proximo : valor - proximo);
+    }
+    return valor;
+  };
+  const resultado = soma();
+  if (indice !== tokens.length) throw new Error("Trecho inesperado: " + atual());
+  return resultado;
+}
+
+function formatarResultado(valor) {
+  if (Object.is(valor, -0)) return "0";
+  return Number.parseFloat(valor.toPrecision(12)).toString();
+}
+
 function calcularResultado() {
-  if (parentesesAbertos === 0) {
-    if (numeroAnterior !== "" && operador !== "" && novoNumero !== "") {
-      calcular();
-      operador = "";
-      novoNumero = "";
-      calculando = true;
-      atualizarVisor();
-      atualizarResultado(numeroAnterior);
-      numeroAnterior = "";
-    }
-  } else {
-    console.log("Erro: Parênteses não estão balanceados.");
+  if (!expressao.trim()) return;
+  try {
+    const resultado = avaliarExpressao(expressao);
+    displayResultado.textContent = formatarResultado(resultado);
+  } catch (erro) {
+    displayResultado.textContent = "Erro";
+    console.warn("Expressão inválida:", erro.message);
   }
 }
-//script para o modo daltonismo
-document.getElementById("btnToggleColors").addEventListener("click",function() {
+
+document.querySelectorAll(".numero").forEach(botao => {
+  botao.addEventListener("click", () => adicionarNumero(botao.textContent.trim()));
+});
+document.querySelectorAll(".operador").forEach(botao => {
+  botao.addEventListener("click", () => inserirOperador(botao.textContent.trim() === "exp" ? "exp" : botao.textContent.trim()));
+});
+document.getElementById("ponto").addEventListener("click", adicionarPontoDecimal);
+document.getElementById("igual").addEventListener("click", calcularResultado);
+document.getElementById("modo").addEventListener("click", alternarModo);
+document.getElementById("limpar").addEventListener("click", () => limparVisor("ac"));
+document.getElementById("btnToggleColors").addEventListener("click", function () {
   document.body.classList.toggle("daltonismo");
   document.getElementById("visor").classList.toggle("daltonismo");
-  document.getElementById("btnToggleColors").classList.toggle("daltonismo");
-  document.getElementById("changeFontBtn").classList.toggle("daltonismo");
-  document.getElementById("zoomInBtn").classList.toggle("daltonismo");
-  document.getElementById("zoomOutBtn").classList.toggle("daltonismo");
-})
-//script para quem é dixleco
-document.addEventListener('DOMContentLoaded', function () {
-  var button = document.getElementById('changeFontBtn');
-  button.addEventListener('click', function () {
-    document.body.classList.toggle('lexend');
-  });
+  ["btnToggleColors", "changeFontBtn", "zoomInBtn", "zoomOutBtn"].forEach(id =>
+    document.getElementById(id).classList.toggle("daltonismo")
+  );
 });
-//script para míope
-let escala = 100; // Inicialmente, a escala é 100%.
-const incrementoEscala = 10; // O aumento ou diminuição percentual.
-const escalaMinima = 100; // A escala mínima permitida.
-const escalaMaxima = 200; // A escala máxima permitida.
+document.getElementById("changeFontBtn").addEventListener("click", () =>
+  document.body.classList.toggle("lexend")
+);
+
 function zoomIn() {
-  if (escala < escalaMaxima) {
-    escala += incrementoEscala;
-    aplicarEscala();
-  }
+  if (escala < escalaMaxima) { escala += incrementoEscala; aplicarEscala(); }
 }
 function zoomOut() {
-  if (escala > escalaMinima) {
-    escala -= incrementoEscala;
-    aplicarEscala();
-  }
+  if (escala > escalaMinima) { escala -= incrementoEscala; aplicarEscala(); }
 }
 function aplicarEscala() {
-  document.body.style.transform = `scale(${escala / 100})`;
+  document.body.style.transform = "scale(" + escala / 100 + ")";
+  document.body.style.transformOrigin = "top left";
 }
-document.addEventListener('DOMContentLoaded', function () {
-  aplicarEscala();
+
+document.addEventListener("keydown", evento => {
+  if (/^[0-9]$/.test(evento.key)) inserirDigito(evento.key);
+  else if (evento.key === ".") adicionarDigito(".");
+  else if ("+-*/^()".includes(evento.key)) {
+    expressao += evento.key;
+    displayResultado.textContent = "";
+    atualizarVisor();
+  } else if (evento.key === "Enter" || evento.key === "=") calcularResultado();
+  else if (evento.key === "Backspace") {
+    expressao = expressao.slice(0, -1);
+    atualizarVisor();
+  } else if (evento.key === "Escape") limparVisor("ac");
 });
+
+atualizarVisor();
