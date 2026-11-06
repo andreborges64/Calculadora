@@ -152,7 +152,7 @@ function tokenizar(texto) {
   }
   const expandidos = [];
   const terminaValor = t => t === ")" || t === "!" || t === "pi" || t === "e" || /^[0-9.]/.test(t);
-  const iniciaValor = t => t === "(" || t === "pi" || t === "e" || /^[0-9.]/.test(t);
+  const iniciaValor = t => t === "(" || t === "pi" || t === "e" || /^[0-9.]/.test(t) || /^[A-Za-z]+$/.test(t);
   for (let i = 0; i < tokens.length; i++) {
     const anterior = tokens[i - 1];
     const atual = tokens[i];
@@ -284,16 +284,7 @@ function calcularResultado() {
   }
 }
 
-document.querySelectorAll(".numero").forEach(botao => {
-  botao.addEventListener("click", () => adicionarNumero(botao.textContent.trim()));
-});
-document.querySelectorAll(".operador").forEach(botao => {
-  botao.addEventListener("click", () => inserirOperador(botao.textContent.trim() === "exp" ? "exp" : botao.textContent.trim()));
-});
-document.getElementById("ponto").addEventListener("click", adicionarPontoDecimal);
-document.getElementById("igual").addEventListener("click", calcularResultado);
-document.getElementById("modo").addEventListener("click", alternarModo);
-document.getElementById("limpar").addEventListener("click", () => limparVisor("ac"));
+// Os botões principais já chamam estas funções pelo onclick definido no HTML.
 document.getElementById("btnToggleColors").addEventListener("click", function () {
   document.body.classList.toggle("daltonismo");
   document.getElementById("visor").classList.toggle("daltonismo");
