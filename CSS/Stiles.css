@@ -131,3 +131,13 @@ button.daltonismo{
     pointer-events: none;
     z-index: 1000;
 }
+
+
+/* O zoom afeta somente a calculadora; a página não cria barras de rolagem. */
+body {
+    overflow: hidden;
+}
+
+#calculadora {
+    transform-origin: center center;
+}
