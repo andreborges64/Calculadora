@@ -111,10 +111,6 @@ function limparVisor(tipo) {
   if (tipo === "ac" || tipo === "c") {
     expressao = "";
     displayResultado.textContent = "";
-    if (tipo === "ac") {
-      modoRadianos = true;
-      displayModo.textContent = "rad";
-    }
     atualizarVisor();
   }
 }
